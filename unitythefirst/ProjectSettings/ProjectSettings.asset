@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 26
-  productGUID: b7c30fbe4e10a2d4ba6ca68dc13cbab6
+  productGUID: c5855975888bb3549b56c9d3415087d2
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -704,10 +704,10 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 7d3856c3-aab9-40ca-a709-eb6121b38726
+  cloudProjectId: 8c72d36d-4820-4990-8601-fede6fa113ec
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: unitythefirst
+  projectName: unitythefirst 2024-02-17_21-53-33
   organizationId: msokolov3
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
