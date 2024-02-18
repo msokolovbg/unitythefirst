@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,13 +15,17 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer;
     private bool isTouchingGround;
 
-    private Animator playerAnimation; 
+    private Animator playerAnimation;
+
+    private Vector3 respawnPoint;
+    public GameObject fallDetector;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GetComponent<Rigidbody2D>();
         playerAnimation = GetComponent<Animator>();
+        respawnPoint = transform.position;
     }
 
     // Upate is called once per frame
@@ -28,6 +33,7 @@ public class PlayerController : MonoBehaviour
     {
         isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         direction = Input.GetAxis("Horizontal");
+
         if (direction > 0f) {
             player.velocity = new Vector2(direction * speed, player.velocity.y);
             transform.localScale = new Vector2(1f, 1f);
@@ -47,5 +53,28 @@ public class PlayerController : MonoBehaviour
         }
         playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
         playerAnimation.SetBool("OnGround", isTouchingGround);
+
+        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "FallDetector")
+        {
+            transform.position = respawnPoint;
+        }
+        else if(collision.tag == "Checkpoint")
+        {
+            respawnPoint = transform.position;
+        }
+        else if(collision.tag == "NextLevel")
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            respawnPoint = transform.position;
+        }
+        else if(collision.tag == "PreviousLevel")
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+            respawnPoint = transform.position;
+        }
     }
 }
