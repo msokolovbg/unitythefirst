@@ -31,31 +31,29 @@ public class PlayerController : MonoBehaviour
     // Upate is called once per frame
     void Update()
     {
-        isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-        direction = Input.GetAxis("Horizontal");
+    isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    direction = Input.GetAxis("Horizontal");
 
-        if (direction > 0f) {
-            player.velocity = new Vector2(direction * speed, player.velocity.y);
-            transform.localScale = new Vector2(1f, 1f);
-        }
-        else if (direction < 0f){
-            player.velocity = new Vector2(direction * speed, player.velocity.y);
-            transform.localScale = new Vector2(-1f, 1f);
-        }
-        else
-        {
-            player.velocity = new Vector2(0, player.velocity.y);
-
-        }
-        if (Input.GetButtonDown("Jump") && isTouchingGround)
-        {
-            player.velocity = new Vector2(player.velocity.x, jumpSpeed);
-        }
-        playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
-        playerAnimation.SetBool("OnGround", isTouchingGround);
-
-        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+    if (direction != 0f) {
+        player.velocity = new Vector2(direction * speed, player.velocity.y);
+        transform.localScale = new Vector2(Mathf.Sign(direction), 1f);
+        playerAnimation.SetBool("IsRunning", true); // Set IsRunning to true if moving
     }
+    else {
+        player.velocity = new Vector2(0, player.velocity.y);
+        playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
+    }
+
+    if (Input.GetButtonDown("Jump") && isTouchingGround)
+    {
+        player.velocity = new Vector2(player.velocity.x, jumpSpeed);
+    }
+
+    playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
+    playerAnimation.SetBool("OnGround", isTouchingGround);
+
+    fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+   }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "FallDetector")
