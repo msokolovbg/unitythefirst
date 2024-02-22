@@ -28,48 +28,57 @@ public class PlayerController : MonoBehaviour
         respawnPoint = transform.position;
     }
 
-    // Upate is called once per frame
+    // Update is called once per frame
     void Update()
     {
-    isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-    direction = Input.GetAxis("Horizontal");
+        isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        direction = Input.GetAxis("Horizontal");
 
-    if (direction != 0f) {
-        player.velocity = new Vector2(direction * speed, player.velocity.y);
-        transform.localScale = new Vector2(Mathf.Sign(direction), 1f);
-        playerAnimation.SetBool("IsRunning", true); // Set IsRunning to true if moving
+        if (direction != 0f)
+        {
+            player.velocity = new Vector2(direction * speed, player.velocity.y);
+            transform.localScale = new Vector2(Mathf.Sign(direction), 1f);
+            playerAnimation.SetBool("IsRunning", true); // Set IsRunning to true if moving
+        }
+        else
+        {
+            player.velocity = new Vector2(0, player.velocity.y);
+            playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
+        }
+
+        if (Input.GetMouseButtonDown(0)) // Change to appropriate input method(mouse1 atm)
+        {
+            // Trigger attack animation
+            playerAnimation.SetTrigger("Attack");
+        }
+//TO DO : Stop the attack as it constantly attacks
+        if (Input.GetButtonDown("Jump") && isTouchingGround)
+        {
+            player.velocity = new Vector2(player.velocity.x, jumpSpeed);
+        }
+
+        playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
+        playerAnimation.SetBool("OnGround", isTouchingGround);
+
+        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
     }
-    else {
-        player.velocity = new Vector2(0, player.velocity.y);
-        playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
-    }
 
-    if (Input.GetButtonDown("Jump") && isTouchingGround)
-    {
-        player.velocity = new Vector2(player.velocity.x, jumpSpeed);
-    }
-
-    playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
-    playerAnimation.SetBool("OnGround", isTouchingGround);
-
-    fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
-   }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "FallDetector")
+        if (collision.tag == "FallDetector")
         {
             transform.position = respawnPoint;
         }
-        else if(collision.tag == "Checkpoint")
+        else if (collision.tag == "Checkpoint")
         {
             respawnPoint = transform.position;
         }
-        else if(collision.tag == "NextLevel")
+        else if (collision.tag == "NextLevel")
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             respawnPoint = transform.position;
         }
-        else if(collision.tag == "PreviousLevel")
+        else if (collision.tag == "PreviousLevel")
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
             respawnPoint = transform.position;
