@@ -46,12 +46,13 @@ public class PlayerController : MonoBehaviour
             playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
         }
 
-        if (Input.GetMouseButtonDown(0)) // Change to appropriate input method(mouse1 atm)
+        if (Input.GetMouseButtonDown(0)) // Change to appropriate input method (e.g., GetButtonDown("Fire1"))
         {
             // Trigger attack animation
             playerAnimation.SetTrigger("Attack");
+            StartCoroutine(StopAttackAnimation());
         }
-//TO DO : Stop the attack as it constantly attacks
+
         if (Input.GetButtonDown("Jump") && isTouchingGround)
         {
             player.velocity = new Vector2(player.velocity.x, jumpSpeed);
@@ -61,6 +62,15 @@ public class PlayerController : MonoBehaviour
         playerAnimation.SetBool("OnGround", isTouchingGround);
 
         fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+    }
+
+    IEnumerator StopAttackAnimation()
+    {
+        // Wait for the attack animation to finish playing
+        yield return new WaitForSeconds(1f);
+
+        // Set Attack trigger to false to stop the attack animation
+        playerAnimation.ResetTrigger("Attack");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
