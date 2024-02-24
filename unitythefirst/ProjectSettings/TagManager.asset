@@ -8,6 +8,11 @@ TagManager:
   - Checkpoint
   - NextLevel
   - PreviousLevel
+  - Spawn
+  - martenicas
+  - Undefined
+  - Cherry
+  - Point
   layers:
   - Default
   - TransparentFX

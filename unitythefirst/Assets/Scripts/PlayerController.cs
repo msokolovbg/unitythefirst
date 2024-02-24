@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,6 +22,13 @@ public class PlayerController : MonoBehaviour
     private Vector3 respawnPoint;
     public GameObject fallDetector;
 
+    private int points = 0;
+    [SerializeField] private Text pointsText;
+    private bool pointCounted = false;
+
+    
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,40 +38,40 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+void Update()
+{
+    isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    direction = Input.GetAxis("Horizontal");
+
+    if (direction != 0f)
     {
-        isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-        direction = Input.GetAxis("Horizontal");
-
-        if (direction != 0f)
-        {
-            player.velocity = new Vector2(direction * speed, player.velocity.y);
-            transform.localScale = new Vector2(Mathf.Sign(direction), 1f);
-            playerAnimation.SetBool("IsRunning", true); // Set IsRunning to true if moving
-        }
-        else
-        {
-            player.velocity = new Vector2(0, player.velocity.y);
-            playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
-        }
-
-        if (Input.GetMouseButtonDown(0)) // Change to appropriate input method (e.g., GetButtonDown("Fire1"))
-        {
-            // Trigger attack animation
-            playerAnimation.SetTrigger("Attack");
-            StartCoroutine(StopAttackAnimation());
-        }
-
-        if (Input.GetButtonDown("Jump") && isTouchingGround)
-        {
-            player.velocity = new Vector2(player.velocity.x, jumpSpeed);
-        }
-
-        playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
-        playerAnimation.SetBool("OnGround", isTouchingGround);
-
-        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+        player.velocity = new Vector2(direction * speed, player.velocity.y);
+        transform.localScale = new Vector2(Mathf.Sign(direction), 1f);
+        playerAnimation.SetBool("IsRunning", true); // Set IsRunning to true if moving
     }
+    else
+    {
+        player.velocity = new Vector2(0, player.velocity.y);
+        playerAnimation.SetBool("IsRunning", false); // Set IsRunning to false if not moving
+    }
+
+    if (Input.GetMouseButtonDown(0)) // Change to appropriate input method (e.g., GetButtonDown("Fire1"))
+    {
+        // Trigger attack animation
+        playerAnimation.SetTrigger("Attack");
+        StartCoroutine(StopAttackAnimation());
+    }
+
+    if (Input.GetButtonDown("Jump"))
+    {
+        Jump();
+    }
+
+    playerAnimation.SetFloat("Speed", Mathf.Abs(player.velocity.x));
+    playerAnimation.SetBool("OnGround", isTouchingGround);
+
+    fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+}
 
     IEnumerator StopAttackAnimation()
     {
@@ -73,25 +82,58 @@ public class PlayerController : MonoBehaviour
         playerAnimation.ResetTrigger("Attack");
     }
 
+    void Jump()
+    {
+        if (isTouchingGround)
+        {
+            player.velocity = new Vector2(player.velocity.x, jumpSpeed);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+    if (collision.tag == "Point" && collision.gameObject.activeSelf) // Check if the cherry is active
+    {
+        collision.gameObject.SetActive(false); // Disable the collider temporarily
+        Destroy(collision.gameObject);
+        points++;
+        pointsText.text = points.ToString();
+    }
         if (collision.tag == "FallDetector")
         {
             transform.position = respawnPoint;
         }
-        else if (collision.tag == "Checkpoint")
+        if (collision.tag == "Checkpoint")
         {
-            respawnPoint = transform.position;
-        }
-        else if (collision.tag == "NextLevel")
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            respawnPoint = transform.position;
-        }
-        else if (collision.tag == "PreviousLevel")
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
             respawnPoint = transform.position;
         }
     }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.tag == "Point")
+        {
+            pointCounted = false;
+        }
+    }
+//    private void OnTriggerEnter2D(Collider2D collision)
+//    {
+//        if (collision.tag == "FallDetector")
+//        {
+//            transform.position = respawnPoint;
+//        }
+//        else if (collision.tag == "Checkpoint")
+//        {
+//            respawnPoint = transform.position;
+//        }
+//        else if (collision.tag == "NextLevel")
+//        {
+//           SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+//            respawnPoint = transform.position;
+//        }
+//        else if (collision.tag == "PreviousLevel")
+//        {
+//            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+//            respawnPoint = transform.position;
+//        }
+//    }
 }
